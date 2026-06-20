@@ -72,4 +72,6 @@ bundle exec fastlane ios doctor
 bundle exec fastlane ios release submit_for_review:true
 ```
 
-The release lane builds `Flux Relay` version `1.0.0`, chooses the next available App Store Connect build number unless `FLUX_RELAY_BUILD_NUMBER` is set, uploads EN/TR metadata and screenshots, and requests automatic release after approval.
+The release lane builds `Flux Relay` version `1.0`, sets the 4+ age-rating questionnaire, chooses the next available App Store Connect build number unless `FLUX_RELAY_BUILD_NUMBER` is set, uploads EN/TR metadata and screenshots, and requests automatic release after approval.
+
+App Privacy is tracked in `fastlane/app_privacy_details.json` and has been published in ASC as "Data Not Collected" with the GitHub Pages privacy URL. Apple does not currently allow this privacy questionnaire through the API-key-only release lane, so future privacy changes must be made through ASC web or an Apple-ID Fastlane session.

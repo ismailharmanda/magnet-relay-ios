@@ -63,5 +63,7 @@
 - Internal target/module names remain MagnetRelay for now.
 - Primary category: Games. Subcategory: Puzzle. Age rating target: 4+.
 - v1 privacy stance: no data collected, no tracking, no account, no ads/IAP.
+- Privacy source: `fastlane/app_privacy_details.json` (`DATA_NOT_COLLECTED`); published in ASC on 2026-06-21 with the GitHub Pages privacy URL.
+- Age rating automation source: `fastlane/app_rating_config.json` (all content descriptors `NONE`, no gambling, no unrestricted web access, no 17+ flag).
 - Preflight name check on 2026-06-20 found no exact `Flux Relay` software title in the US Apple Search API results; this is not a reservation or legal clearance.
 - Run final App Store Connect reservation and trademark clearance before submission.

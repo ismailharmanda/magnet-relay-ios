@@ -1,5 +1,6 @@
 require "base64"
 require "fileutils"
+require "json"
 require "shellwords"
 require "spaceship"
 
@@ -13,7 +14,9 @@ IOS_SCHEME = "MagnetRelay"
 IOS_IPA_PATH = File.join(ROOT, "build", "ios", "fastlane", "FluxRelay.ipa")
 METADATA_PATH = File.join(ROOT, "fastlane", "metadata")
 SCREENSHOTS_PATH = File.join(ROOT, "AppStore", "Screenshots", "iPhone-6.9")
-APP_VERSION = "1.0.0"
+PRIVACY_DETAILS_PATH = File.join(ROOT, "fastlane", "app_privacy_details.json")
+APP_RATING_CONFIG_PATH = File.join(ROOT, "fastlane", "app_rating_config.json")
+APP_VERSION = "1.0"
 APP_NAME = "Flux Relay: Magnet Puzzle"
 APP_SKU = "flux-relay-ios"
 
@@ -120,6 +123,8 @@ def verify_release_files!
   required_files = [
     File.join(METADATA_PATH, "en-US", "description.txt"),
     File.join(METADATA_PATH, "tr-TR", "description.txt"),
+    PRIVACY_DETAILS_PATH,
+    APP_RATING_CONFIG_PATH,
     File.join(SCREENSHOTS_PATH, "en-US", "01-flux-relay.png"),
     File.join(SCREENSHOTS_PATH, "tr-TR", "01-flux-relay.png")
   ]
@@ -184,6 +189,7 @@ platform :ios do
       languages: ["en-US", "tr-TR"],
       primary_category: "Games",
       primary_first_sub_category: "Puzzle",
+      app_rating_config_path: APP_RATING_CONFIG_PATH,
       force: true,
       submit_for_review: submit,
       automatic_release: true,
