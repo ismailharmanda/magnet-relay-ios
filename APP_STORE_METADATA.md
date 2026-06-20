@@ -62,6 +62,7 @@
 - Public display name in the app binary: Flux Relay
 - Internal target/module names remain MagnetRelay for now.
 - Primary category: Games. Subcategory: Puzzle. Age rating target: 4+.
+- Copyright source: `fastlane/metadata/copyright.txt` (`2026 Ismail Harmanda`).
 - v1 privacy stance: no data collected, no tracking, no account, no ads/IAP.
 - Privacy source: `fastlane/app_privacy_details.json` (`DATA_NOT_COLLECTED`); published in ASC on 2026-06-21 with the GitHub Pages privacy URL.
 - Age rating automation source: `fastlane/app_rating_config.json` (all content descriptors `NONE`; required safety flags `false`).

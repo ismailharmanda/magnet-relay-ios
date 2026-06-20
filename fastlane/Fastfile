@@ -19,6 +19,9 @@ APP_RATING_CONFIG_PATH = File.join(ROOT, "fastlane", "app_rating_config.json")
 APP_VERSION = "1.0"
 APP_NAME = "Flux Relay: Magnet Puzzle"
 APP_SKU = "flux-relay-ios"
+APP_STORE_LANGUAGES = ["en-US", "tr"]
+APP_STORE_PRIMARY_CATEGORY = "GAMES"
+APP_STORE_PRIMARY_FIRST_SUB_CATEGORY = "GAMES_PUZZLE"
 
 def required_env!(key)
   value = ENV[key].to_s.strip
@@ -121,6 +124,7 @@ end
 
 def verify_release_files!
   required_files = [
+    File.join(METADATA_PATH, "copyright.txt"),
     File.join(METADATA_PATH, "en-US", "description.txt"),
     File.join(METADATA_PATH, "tr", "description.txt"),
     PRIVACY_DETAILS_PATH,
@@ -130,6 +134,41 @@ def verify_release_files!
   ]
   missing = required_files.reject { |path| File.file?(path) }
   UI.user_error!("Missing release files:\n#{missing.join("\n")}") unless missing.empty?
+end
+
+def app_review_submission_information
+  {
+    add_id_info_uses_idfa: false,
+    export_compliance_uses_encryption: false,
+    export_compliance_encryption_updated: false,
+    content_rights_contains_third_party_content: true,
+    content_rights_has_rights: true
+  }
+end
+
+def app_store_upload_options(api_key:, submit:, ipa: nil, skip_binary_upload: false, skip_screenshots: false)
+  options = {
+    api_key: api_key,
+    app_identifier: IOS_BUNDLE_ID,
+    metadata_path: METADATA_PATH,
+    screenshots_path: SCREENSHOTS_PATH,
+    app_version: APP_VERSION,
+    languages: APP_STORE_LANGUAGES,
+    primary_category: APP_STORE_PRIMARY_CATEGORY,
+    primary_first_sub_category: APP_STORE_PRIMARY_FIRST_SUB_CATEGORY,
+    app_rating_config_path: APP_RATING_CONFIG_PATH,
+    force: true,
+    submit_for_review: submit,
+    automatic_release: true,
+    run_precheck_before_submit: true,
+    precheck_default_rule_level: :warn,
+    precheck_include_in_app_purchases: false,
+    skip_binary_upload: skip_binary_upload,
+    skip_screenshots: skip_screenshots,
+    submission_information: app_review_submission_information
+  }
+  options[:ipa] = ipa if ipa
+  options
 end
 
 platform :ios do
@@ -179,29 +218,29 @@ platform :ios do
     )
 
     upload_to_app_store(
-      api_key: api_key,
-      app_identifier: IOS_BUNDLE_ID,
-      ipa: IOS_IPA_PATH,
-      metadata_path: METADATA_PATH,
-      screenshots_path: SCREENSHOTS_PATH,
-      app_version: APP_VERSION,
-      languages: ["en-US", "tr"],
-      primary_category: "Games",
-      primary_first_sub_category: "Puzzle",
-      app_rating_config_path: APP_RATING_CONFIG_PATH,
-      force: true,
-      submit_for_review: submit,
-      automatic_release: true,
-      run_precheck_before_submit: true,
-      precheck_default_rule_level: :warn,
-      precheck_include_in_app_purchases: false,
-      submission_information: {
-        add_id_info_uses_idfa: false,
-        export_compliance_uses_encryption: false,
-        export_compliance_encryption_updated: false,
-        content_rights_contains_third_party_content: true,
-        content_rights_has_rights: true
-      }
+      **app_store_upload_options(
+        api_key: api_key,
+        submit: submit,
+        ipa: IOS_IPA_PATH
+      )
+    )
+  end
+
+  desc "Upload metadata and submit the already selected App Store build without rebuilding."
+  lane :submit_metadata do |options|
+    submit = options.fetch(:submit_for_review, true).to_s != "false"
+    skip_screenshots = options.fetch(:skip_screenshots, true).to_s != "false"
+    api_key = app_store_api_key
+    ensure_app_record!
+    verify_release_files!
+
+    upload_to_app_store(
+      **app_store_upload_options(
+        api_key: api_key,
+        submit: submit,
+        skip_binary_upload: true,
+        skip_screenshots: skip_screenshots
+      )
     )
   end
 end

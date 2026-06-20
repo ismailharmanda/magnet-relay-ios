@@ -39,6 +39,14 @@ Check Apple Developer bundle id and App Store Connect app record.
 
 Build, upload metadata/screenshots, and optionally submit for App Review.
 
+### ios submit_metadata
+
+```sh
+[bundle exec] fastlane ios submit_metadata
+```
+
+Upload metadata and submit the already selected App Store build without rebuilding.
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
