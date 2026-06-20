@@ -170,7 +170,6 @@ platform :ios do
       output_directory: File.dirname(IOS_IPA_PATH),
       output_name: File.basename(IOS_IPA_PATH),
       xcargs: "#{app_store_xcargs} MARKETING_VERSION=#{APP_VERSION.shellescape} CURRENT_PROJECT_VERSION=#{build_number.shellescape}",
-      export_xcargs: app_store_xcargs,
       export_options: {
         signingStyle: "automatic",
         teamID: TEAM_ID,
