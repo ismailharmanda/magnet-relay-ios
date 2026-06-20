@@ -122,11 +122,11 @@ end
 def verify_release_files!
   required_files = [
     File.join(METADATA_PATH, "en-US", "description.txt"),
-    File.join(METADATA_PATH, "tr-TR", "description.txt"),
+    File.join(METADATA_PATH, "tr", "description.txt"),
     PRIVACY_DETAILS_PATH,
     APP_RATING_CONFIG_PATH,
     File.join(SCREENSHOTS_PATH, "en-US", "01-flux-relay.png"),
-    File.join(SCREENSHOTS_PATH, "tr-TR", "01-flux-relay.png")
+    File.join(SCREENSHOTS_PATH, "tr", "01-flux-relay.png")
   ]
   missing = required_files.reject { |path| File.file?(path) }
   UI.user_error!("Missing release files:\n#{missing.join("\n")}") unless missing.empty?
@@ -185,7 +185,7 @@ platform :ios do
       metadata_path: METADATA_PATH,
       screenshots_path: SCREENSHOTS_PATH,
       app_version: APP_VERSION,
-      languages: ["en-US", "tr-TR"],
+      languages: ["en-US", "tr"],
       primary_category: "Games",
       primary_first_sub_category: "Puzzle",
       app_rating_config_path: APP_RATING_CONFIG_PATH,

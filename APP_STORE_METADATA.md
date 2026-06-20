@@ -11,7 +11,7 @@
 - Support URL: https://ismailharmanda.github.io/magnet-relay-ios/support.html
 - Marketing URL: https://ismailharmanda.github.io/magnet-relay-ios/
 
-### Turkish `tr-TR`
+### Turkish `tr`
 
 - App Store name: Flux Relay: Magnet Puzzle
 - Subtitle: Mıknatıslarla Alan Mantığı
@@ -30,7 +30,7 @@
 
 ## Screenshot Set
 
-- Locales: `en-US`, `tr-TR`
+- Locales: `en-US`, `tr`
 - Device family: iPhone 6.9"
 - Final size: 1320x2868 PNG, RGB, no alpha
 - Raw captures: `AppStore/Screenshots/raw/iPhone-17-Pro-Max/`

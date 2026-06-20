@@ -55,7 +55,7 @@ let locales: [LocaleSpec] = [
         ]
     ),
     LocaleSpec(
-        identifier: "tr-TR",
+        identifier: "tr",
         screenshots: [
             ScreenshotSpec(
                 rawName: "01-home.png",
