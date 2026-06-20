@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "panel_glass_notches.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

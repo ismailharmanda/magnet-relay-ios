@@ -1,0 +1,21 @@
+.DS_Store
+
+# Xcode and generated build output
+build/
+DerivedData/
+*.xcarchive
+*.ipa
+*.dSYM.zip
+*.resultbundle
+
+# Ruby/Fastlane local state
+.bundle/
+vendor/bundle/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.html
+
+# App Store Connect credentials must live in GitHub Secrets or local ignored files.
+.env.release
+*.p8
+AuthKey_*.p8

@@ -1,0 +1,9 @@
+No login, subscription, purchase, or demo account is required.
+
+Suggested review path:
+1. Open Flux Relay.
+2. Tap Play.
+3. Drag the magnet in MR-01, pulse the grid, and solve the level.
+4. Confirm the level-completion overlay appears and advances into the next lab round.
+
+The app stores only local game progress on device and does not collect user data or track users.

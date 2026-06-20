@@ -1,0 +1,1 @@
+Manyetik alanları şekillendir, ızgarayı tetikle ve her yüklü bloğu doğru hedefe kilitle.

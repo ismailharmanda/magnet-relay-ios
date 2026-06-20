@@ -1,0 +1,12 @@
+Flux Relay, bilim kurgu laboratuvarı içinde geçen kompakt bir mantık bulmaca oyunudur.
+
+Mıknatısları taşı, ızgarayı tetikle ve yüklü cam blokları eşleşen soketlere yönlendir. Her bölüm deterministiktir: çözüm polariteyi, görüş hattını, engelleri, tehlikeleri ve doğru tetikleme anını okumaktan gelir.
+
+Öne çıkanlar:
+- Kısa oturumlar için dikey iPhone bulmaca deneyimi.
+- Elle tasarlanmış başlangıç bölümleri ve geniş bir laboratuvar kampanyası.
+- Camgöbeği, amber ve mor polarite mantığı.
+- Tactile SpriteKit hareketi, haptikler ve premium bölüm tamamlama geçişleri.
+- Hesapsız, takipsiz, reklamsız ilk sürüm.
+
+Flux Relay; temiz kuralları, akıllı ızgaraları ve tatmin edici manyetik zincir reaksiyonlarını seven oyuncular için tasarlandı.

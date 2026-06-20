@@ -1,0 +1,12 @@
+Flux Relay is a compact logic puzzle game about shaping magnetic fields inside a sci-fi lab.
+
+Move magnets, pulse the grid, and guide charged glass blocks into matching sockets. Every level is deterministic: victory comes from reading polarity, line of sight, blockers, hazards, and pulse timing.
+
+Features:
+- Portrait iPhone puzzle play for short sessions.
+- Hand-built onboarding levels and a broad campaign of generated lab grids.
+- Cyan, amber, and violet polarity logic.
+- Tactile SpriteKit motion, haptics, and a premium lab-style completion handoff.
+- Local progress with no account, no tracking, and no ads in this first release.
+
+Flux Relay is built for players who like clean rules, clever grids, and satisfying magnetic chain reactions.

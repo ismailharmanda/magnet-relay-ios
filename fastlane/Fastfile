@@ -1,0 +1,202 @@
+require "base64"
+require "fileutils"
+require "shellwords"
+require "spaceship"
+
+default_platform(:ios)
+
+ROOT = File.expand_path("..", __dir__)
+TEAM_ID = "97D3P28B69"
+IOS_BUNDLE_ID = "com.ismailharmanda.magnetrelay"
+IOS_PROJECT = File.join(ROOT, "MagnetRelay.xcodeproj")
+IOS_SCHEME = "MagnetRelay"
+IOS_IPA_PATH = File.join(ROOT, "build", "ios", "fastlane", "FluxRelay.ipa")
+METADATA_PATH = File.join(ROOT, "fastlane", "metadata")
+SCREENSHOTS_PATH = File.join(ROOT, "AppStore", "Screenshots", "iPhone-6.9")
+APP_VERSION = "1.0.0"
+APP_NAME = "Flux Relay: Magnet Puzzle"
+APP_SKU = "flux-relay-ios"
+
+def required_env!(key)
+  value = ENV[key].to_s.strip
+  UI.user_error!("Missing #{key}. Add it to GitHub Actions Secrets or source .env.release locally.") if value.empty?
+  value
+end
+
+def optional_env(key)
+  value = ENV[key].to_s.strip
+  value.empty? ? nil : value
+end
+
+def asc_key_path
+  local_path = optional_env("APP_STORE_CONNECT_KEY_PATH")
+  return local_path if local_path && File.file?(local_path)
+
+  encoded = required_env!("APP_STORE_CONNECT_KEY_P8_BASE64")
+  key_id = required_env!("APP_STORE_CONNECT_KEY_ID")
+  key_dir = File.join(ROOT, "build", "secrets")
+  FileUtils.mkdir_p(key_dir)
+  key_path = File.join(key_dir, "AuthKey_#{key_id}.p8")
+  File.binwrite(key_path, Base64.decode64(encoded))
+  key_path
+end
+
+def app_store_api_key
+  encoded = optional_env("APP_STORE_CONNECT_KEY_P8_BASE64")
+  if encoded
+    app_store_connect_api_key(
+      key_id: required_env!("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: required_env!("APP_STORE_CONNECT_ISSUER_ID"),
+      key_content: encoded,
+      is_key_content_base64: true,
+      duration: 1200,
+      in_house: false
+    )
+  else
+    app_store_connect_api_key(
+      key_id: required_env!("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: required_env!("APP_STORE_CONNECT_ISSUER_ID"),
+      key_filepath: asc_key_path,
+      duration: 1200,
+      in_house: false
+    )
+  end
+end
+
+def configure_connect_api!
+  Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(
+    key_id: required_env!("APP_STORE_CONNECT_KEY_ID"),
+    issuer_id: required_env!("APP_STORE_CONNECT_ISSUER_ID"),
+    filepath: asc_key_path,
+    duration: 1200,
+    in_house: false
+  )
+end
+
+def ensure_app_record!
+  configure_connect_api!
+
+  bundle = Spaceship::ConnectAPI::BundleId.find(IOS_BUNDLE_ID)
+  unless bundle
+    UI.message("Creating Apple Developer bundle id #{IOS_BUNDLE_ID}.")
+    bundle = Spaceship::ConnectAPI::BundleId.create(
+      name: "Flux Relay",
+      platform: Spaceship::ConnectAPI::Platform::IOS,
+      identifier: IOS_BUNDLE_ID,
+      seed_id: nil
+    )
+  end
+
+  app = Spaceship::ConnectAPI::App.find(IOS_BUNDLE_ID)
+  UI.user_error!(
+    "App Store Connect app record is missing for #{IOS_BUNDLE_ID}. " \
+    "Apple does not allow API-key creation for apps in this account. " \
+    "Create it once in App Store Connect with name '#{APP_NAME}', SKU '#{APP_SKU}', bundle id '#{IOS_BUNDLE_ID}', primary locale 'en-US', then rerun this lane."
+  ) unless app
+end
+
+def app_store_xcargs
+  [
+    "-allowProvisioningUpdates",
+    "-authenticationKeyPath #{asc_key_path.shellescape}",
+    "-authenticationKeyID #{required_env!("APP_STORE_CONNECT_KEY_ID").shellescape}",
+    "-authenticationKeyIssuerID #{required_env!("APP_STORE_CONNECT_ISSUER_ID").shellescape}"
+  ].join(" ")
+end
+
+def next_build_number(api_key)
+  latest = latest_testflight_build_number(
+    api_key: api_key,
+    app_identifier: IOS_BUNDLE_ID,
+    version: APP_VERSION,
+    initial_build_number: 0
+  )
+  latest.to_i + 1
+rescue
+  1
+end
+
+def verify_release_files!
+  required_files = [
+    File.join(METADATA_PATH, "en-US", "description.txt"),
+    File.join(METADATA_PATH, "tr-TR", "description.txt"),
+    File.join(SCREENSHOTS_PATH, "en-US", "01-flux-relay.png"),
+    File.join(SCREENSHOTS_PATH, "tr-TR", "01-flux-relay.png")
+  ]
+  missing = required_files.reject { |path| File.file?(path) }
+  UI.user_error!("Missing release files:\n#{missing.join("\n")}") unless missing.empty?
+end
+
+platform :ios do
+  desc "Validate local release inputs without uploading."
+  lane :doctor do
+    required_env!("APP_STORE_CONNECT_KEY_ID")
+    required_env!("APP_STORE_CONNECT_ISSUER_ID")
+    asc_key_path
+    verify_release_files!
+    UI.message("Bundle ID: #{IOS_BUNDLE_ID}")
+    UI.message("Team ID: #{TEAM_ID}")
+    UI.message("Version: #{APP_VERSION}")
+    UI.success("Flux Relay release environment looks ready.")
+  end
+
+  desc "Check Apple Developer bundle id and App Store Connect app record."
+  lane :ensure_app_record do
+    ensure_app_record!
+    UI.success("Apple app record exists for #{IOS_BUNDLE_ID}.")
+  end
+
+  desc "Build, upload metadata/screenshots, and optionally submit for App Review."
+  lane :release do |options|
+    submit = options.fetch(:submit_for_review, true).to_s != "false"
+    api_key = app_store_api_key
+    ensure_app_record!
+    build_number = ENV["FLUX_RELAY_BUILD_NUMBER"].to_s.strip
+    build_number = next_build_number(api_key).to_s if build_number.empty?
+
+    verify_release_files!
+
+    build_app(
+      project: IOS_PROJECT,
+      scheme: IOS_SCHEME,
+      configuration: "Release",
+      clean: true,
+      export_method: "app-store",
+      output_directory: File.dirname(IOS_IPA_PATH),
+      output_name: File.basename(IOS_IPA_PATH),
+      xcargs: "#{app_store_xcargs} MARKETING_VERSION=#{APP_VERSION.shellescape} CURRENT_PROJECT_VERSION=#{build_number.shellescape}",
+      export_xcargs: app_store_xcargs,
+      export_options: {
+        signingStyle: "automatic",
+        teamID: TEAM_ID,
+        manageAppVersionAndBuildNumber: false,
+        uploadSymbols: true
+      }
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: IOS_BUNDLE_ID,
+      ipa: IOS_IPA_PATH,
+      metadata_path: METADATA_PATH,
+      screenshots_path: SCREENSHOTS_PATH,
+      app_version: APP_VERSION,
+      languages: ["en-US", "tr-TR"],
+      primary_category: "Games",
+      primary_first_sub_category: "Puzzle",
+      force: true,
+      submit_for_review: submit,
+      automatic_release: true,
+      run_precheck_before_submit: true,
+      precheck_default_rule_level: :warn,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_encryption_updated: false,
+        content_rights_contains_third_party_content: true,
+        content_rights_has_rights: true
+      }
+    )
+  end
+end
