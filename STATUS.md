@@ -18,3 +18,4 @@
 - Monetization surfaces remain future hooks only; AdMob/IAP credentials and SDKs are intentionally absent from v1.
 - App Store Connect credentials must be stored in GitHub Actions Secrets, not plaintext repo files.
 - Apple currently exposes App Privacy editing through ASC web/Apple-ID session, not the API-key-only release lane; the questionnaire was completed and published in ASC on 2026-06-21.
+- App Store submission completed on 2026-06-21: ASC API verified version `1.0`, build `1`, state `WAITING_FOR_REVIEW`.
